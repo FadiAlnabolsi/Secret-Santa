@@ -27,4 +27,6 @@ urlpatterns = [
     url(r'^accounts/logout/$', 'secretsanta.views.logout'),
     url(r'^accounts/loggedin/$', 'secretsanta.views.loggedin'),
     url(r'^accounts/invalid/$', 'secretsanta.views.invalid_login'),
+    url(r'^accounts/register/$', 'secretsanta.views.register_user'),
+    url(r'^accounts/register_success/$', 'secretsanta.views.register_success'),
 ]
