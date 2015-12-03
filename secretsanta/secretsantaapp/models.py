@@ -6,6 +6,7 @@ import random
 # Create your models here.
 class SecretSantaGroup(models.Model):
 	group_name = models.TextField()
+	owner = models.ForeignKey(User, related_name="owner")
 	members = models.ManyToManyField(User)
 
 
