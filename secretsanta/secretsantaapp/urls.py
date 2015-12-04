@@ -17,17 +17,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from . import views
 
-urlpatterns = patterns('',
-    url(
-        r'^login/$',
-        'django.contrib.auth.views.login',
-        name='login',
-        kwargs={'template_name': 'templates/login.html'}
-    ),
-    url(
-        r'^logout/$',
-        'django.contrib.auth.views.logout',
-        name='logout',
-        kwargs={'next_page': '/'}
-    ),
-)
+urlpatterns = [
+    url(r'^$', views.homepage),
+    url(r'^create_group$', views.create_group),
+]

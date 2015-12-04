@@ -4,6 +4,21 @@
 	<title>Secret Santa</title>
 </head>
 <body>
+	<div>
+		<h1>Secret Santa!</h1>
+		{% if user.is_authenticated %}
+			<p>Welcome {{user}}!</p>
+			<a href="/accounts/logout">Log Out</a>
+		{% else %}
+			<a href="/accounts/login/">Log In</a>
+			<a href="/accounts/register/">Register</a>
+		{% endif %}
+	</div>
+
 	{% block content %} {% endblock %}
+
+	<div class="footer">
+		<h3>About Us</h3>
+	</div>
 </body>
 </html>

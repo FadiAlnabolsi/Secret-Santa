@@ -29,4 +29,6 @@ urlpatterns = [
     url(r'^accounts/invalid/$', 'secretsanta.views.invalid_login'),
     url(r'^accounts/register/$', 'secretsanta.views.register_user'),
     url(r'^accounts/register_success/$', 'secretsanta.views.register_success'),
+
+    url(r'', include('secretsantaapp.urls'))
 ]
