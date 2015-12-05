@@ -2,5 +2,10 @@
 
 {% block content %}
 	<p>Homepage for Secret Santa!</p>
-	<a href="create_group">Create a Santa Group!</a>
+	{% for group in SecretSantaGroups %}
+		<p>
+			<a href="/secretsanta/{{group.pk}}">{{group.group_name}}</a>
+		</p>
+	{% endfor %}
+	<a href="create_group">Create a new Secret Santa Group!</a>
 {% endblock %}
