@@ -7,5 +7,9 @@
 			<a href="/secretsanta/{{group.pk}}">{{group.group_name}}</a>
 		</p>
 	{% endfor %}
-	<a href="create_group">Create a new Secret Santa Group!</a>
+
+	{% if user.is_authenticated %}
+		<a href="create_group">Create a new Secret Santa Group!</a>
+	{% endif %}
+
 {% endblock %}

@@ -26,6 +26,9 @@ def SecretSantaPage(request, post_id):
 	if not SS:
 		return redirect('secretsantaapp.views.homepage')
 
+	if (request.user not in SS[0].members.all()):
+		return redirect('secretsantaapp.views.homepage')
+
 	return render(request, 'secret_santa_page.html', {'SecretSanta':SS[0]})
 
 
