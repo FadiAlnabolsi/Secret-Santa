@@ -1,33 +1,47 @@
 from django.shortcuts import render, redirect
 
 from secretsantaapp.forms import SecretSantaGroupForm
-from secretsantaapp.models import SecretSantaGroup
+from secretsantaapp.models import SecretSantaGroup, assignment
 
 
 # Create your views here.
 
+#homepage has a link to create a new group
+#homepage has a view to every group that the logged in user is accessed to
 def homepage(request):
-	return render(request, 'homepage.html')
+	user = request.user
+	userGroups = []
+	allGroups = SecretSantaGroup.objects.all()
+
+	for group in allGroups:
+		if user in group.members.all():
+			userGroups.append(group)
+
+	return render(request, 'homepage.html', {'SecretSantaGroups':userGroups})
+
+
+def SecretSantaPage(request, post_id):
+	SS = SecretSantaGroup.objects.all().filter(pk=post_id)
+
+	if not SS:
+		return redirect('secretsantaapp.views.homepage')
+
+	return render(request, 'secret_santa_page.html', {'SecretSanta':SS[0]})
+
 
 def create_group(request):
 	ssgForm = SecretSantaGroupForm(request.POST)
-	print(request.user.username)
 
 	if ssgForm.is_valid():
-		print(request.user)
 		newGroup = SecretSantaGroup()
 		newGroup.owner = request.user
-		#newGroup.members.add(request.user)
 		newGroup.group_name = ssgForm.data['group_name']
 		newGroup.save()
-		#ssgForm.save()
-		#newGroup = {'owner':'fads'}
-		#newGroup.update(ssgForm.data)
-		#print(newGroup)
+		newGroup.members.add(newGroup.owner)
+		newGroup.save()
 
-		#newGroup = SecretSantaGroup()
-		#newGroup.group_name = newGroup['group_name']
-		#newGroup.user = request.POST.user
 		return render(request, 'homepage.html')
 
 	return render(request, 'create_group.html', {'SecretSantaGroupForm':ssgForm})
+
+

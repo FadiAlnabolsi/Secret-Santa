@@ -19,5 +19,6 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.homepage),
+    url(r'^secretsanta/(?P<post_id>[0-9]+)$', views.SecretSantaPage),
     url(r'^create_group$', views.create_group),
 ]

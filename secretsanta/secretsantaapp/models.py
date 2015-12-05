@@ -8,6 +8,7 @@ class SecretSantaGroup(models.Model):
 	group_name = models.TextField()
 	owner = models.ForeignKey(User, related_name="owner")
 	members = models.ManyToManyField(User)
+	assignments_generated = models.BooleanField(default=False)
 
 
 	def __str__(self):
@@ -50,23 +51,26 @@ class SecretSantaGroup(models.Model):
 
 	def generate_assignments(self):
 		assignments = assignment.objects.filter(group=self)
-
-		for member in self.members.all():
-			if (self.check_if_giver(self, member) == False):
-				#if not a giver, give to someone
-				added_user = False
-				while added_user == False:
-					receiver = random.choice(self.members.all())
-					if (self.check_if_receiver(self, receiver) == False):
-						#can't give to yourself
-						if(receiver != member):
-							new_assignment = assignment()
-							new_assignment.group = self
-							new_assignment.group_id = self.id
-							new_assignment.giver = member
-							new_assignment.receiver = receiver
-							new_assignment.save()
-							added_user = True
+		if (self.assignments_generated == False):
+			self.assignments_generated = True
+			self.save() 
+			
+			for member in self.members.all():
+				if (self.check_if_giver(self, member) == False):
+					#if not a giver, give to someone
+					added_user = False
+					while added_user == False:
+						receiver = random.choice(self.members.all())
+						if (self.check_if_receiver(self, receiver) == False):
+							#can't give to yourself
+							if(receiver != member):
+								new_assignment = assignment()
+								new_assignment.group = self
+								new_assignment.group_id = self.id
+								new_assignment.giver = member
+								new_assignment.receiver = receiver
+								new_assignment.save()
+								added_user = True
 
     #generate to create assignments
     #update to check for any removed & new users, and only assign to the new users
