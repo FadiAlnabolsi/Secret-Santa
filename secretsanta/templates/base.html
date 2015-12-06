@@ -5,9 +5,9 @@
 </head>
 <body>
 	<div>
-		<h1>Secret Santa!</h1>
+		<a href="/"><h1>Secret Santa!</h1></a>
 		{% if user.is_authenticated %}
-			<p>Welcome {{user}}!</p>
+			<p>Welcome {{user.first_name}}!</p>
 			<a href="/accounts/logout">Log Out</a>
 		{% else %}
 			<a href="/accounts/login/">Log In</a>

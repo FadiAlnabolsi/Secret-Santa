@@ -8,8 +8,8 @@ class SecretSantaGroup(models.Model):
 	group_name = models.TextField()
 	owner = models.ForeignKey(User, related_name="owner")
 	members = models.ManyToManyField(User)
+	invites = models.ManyToManyField(User, related_name="invites_sent")
 	assignments_generated = models.BooleanField(default=False)
-
 
 	def __str__(self):
 		return self.group_name
