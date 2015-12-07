@@ -7,8 +7,8 @@ import random
 class SecretSantaGroup(models.Model):
 	group_name = models.TextField()
 	owner = models.ForeignKey(User, related_name="owner")
-	members = models.ManyToManyField(User)
-	invites = models.ManyToManyField(User, related_name="invites_sent")
+	members = models.ManyToManyField(User, blank=True)
+	invites = models.ManyToManyField(User, related_name="invites_sent", blank=True)
 	assignments_generated = models.BooleanField(default=False)
 
 	def __str__(self):
@@ -82,6 +82,11 @@ class assignment(models.Model):
 
 	def __str__(self):
 		return self.group.group_name
+
+class UserInfo(models.Model):
+	user = models.OneToOneField(User, null=True)
+	groups = models.ManyToManyField(SecretSantaGroup, related_name='participating_in', blank=True)
+	invites = models.ManyToManyField(SecretSantaGroup, related_name='invited_to', blank=True)
 	
 	# def clean(self):
 	# 	if self.giver not in self.group.members:

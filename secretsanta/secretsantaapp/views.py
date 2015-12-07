@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 
 from secretsantaapp.forms import SecretSantaGroupForm
-from secretsantaapp.models import SecretSantaGroup, assignment
+from secretsantaapp.models import SecretSantaGroup, assignment, UserInfo
 
 
 # Create your views here.
@@ -14,91 +14,83 @@ def homepage(request):
 	if (request.user.is_anonymous()):
 		return render(request, 'homepage.html')
 
-	user = request.user
 	userGroups = []
-	allGroups = SecretSantaGroup.objects.all()
+	userInfo = UserInfo.objects.get(user=request.user)
 
-	for group in allGroups:
-		if user in group.members.all():
-			userGroups.append(group)
+	for group in userInfo.groups.all():
+		userGroups.append(group)
 
 	return render(request, 'homepage.html', {'SecretSantaGroups':userGroups})
 
 
 def SecretSantaPage(request, post_id, invite=''):
-	SS = SecretSantaGroup.objects.all().filter(pk=post_id)
+	try:
+		SS = SecretSantaGroup.objects.get(pk=post_id)
+	except Exception as e:
+		return redirect('secretsantaapp.views.homepage')
+
+	if (request.user not in SS.members.all()):
+		return redirect('secretsantaapp.views.homepage')
+
 	inv = request.POST.get("invite", "")
-	if (inv != ""):
+
+	#check if an invite was sent
+	if (inv != ''):
 		alreadyInvited = False
 
-		if not SS:
-			return redirect('secretsantaapp.views.homepage')
-
-		if (request.user not in SS[0].members.all()):
-			return redirect('secretsantaapp.views.homepage')
-
-		if (request.user != SS[0].owner):
-			return redirect('secretsantaapp.views.SecretSantaPage', post_id)
+		#check if the owner is sending an invite
+		if (request.user != SS.owner):
+			return render(request, 'secret_santa_page.html', {'SecretSanta':SS})
 
 		#I need to check to see if the invitee is an actual user
-		invitee = User.objects.filter(username=inv)
-		if not invitee:
+		try:
+			invitee = User.objects.get(username=inv)
+		except Exception as e:
 			return redirect('secretsantaapp.views.SecretSantaPage', post_id)
 
 		#check if that user is already invited
-		for invitees in SS[0].invites.all():
-			if (invitee[0].username == invitees.username):
+		for invitees in SS.invites.all():
+			if (invitee.username == invitees.username):
 				alreadyInvited = True
 
-		#if user is already invited, return to the santa page
+		#if user is already invited, return to the santa group page
 		if (alreadyInvited == True):
 			return redirect('secretsantaapp.views.SecretSantaPage', post_id)
 
-		SS[0].invites.add(invitee[0])
-		return render(request, 'secret_santa_page.html', {'SecretSanta':SS[0]})
+		try:	
+			newInfo = UserInfo()
+			newInfo.user = invitee
+			newInfo.save()
+			newInfo.invites.add(SS)
+			newInfo.save()
+		except Exception as e:
+			newInfo = UserInfo.objects.get(user=request.user)
+			newInfo.groups.add(SS)	
 
-	if not SS:
+		SS.invites.add(invitee)
+
+		return render(request, 'secret_santa_page.html', {'SecretSanta':SS})
+
+	return render(request, 'secret_santa_page.html', {'SecretSanta':SS})
+
+def CancelInvite(request, post_id, invite):
+	try:
+		SS = SecretSantaGroup.objects.get(pk=post_id)
+	except Exception as e:
 		return redirect('secretsantaapp.views.homepage')
 
-	if (request.user not in SS[0].members.all()):
+	if (request.user != SS.owner):
 		return redirect('secretsantaapp.views.homepage')
 
+	#remove invite from user
+	removedUser = User.objects.get(username=invite)
+	removedUserInfo = UserInfo.objects.get(user=removedUser)
+	removedUserInfo.invites.remove(SS)
 
+	#remove invite from group
+	SS.invites.remove(removedUser)
 
-	return render(request, 'secret_santa_page.html', {'SecretSanta':SS[0]})
-
-def SecretSantaInvite(request, post_id, invite=''):
-	SS = SecretSantaGroup.objects.all().filter(pk=post_id)
-	alreadyInvited = False
-	print('here')
-
-	if not SS:
-		return redirect('secretsantaapp.views.homepage')
-
-	if (request.user not in SS[0].members.all()):
-		return redirect('secretsantaapp.views.homepage')
-
-	if (request.user != SS[0].owner):
-		return redirect('secretsantaapp.views.SecretSantaPage', post_id)
-
-	#I need to check to see if the invitee is an actual user
-	invitee = User.objects.filter(username=invite)
-	if not invitee:
-		return redirect('secretsantaapp.views.SecretSantaPage', post_id)
-
-	#check if that user is already invited
-	for singleInv in SS[0].invites.all():
-		if (invitee == invitees):
-			alreadyInvited = True
-
-	#if user is already invited, return to the santa page
-	if (alreadyInvited == True):
-		return redirect('secretsantaapp.views.SecretSantaPage', post_id)
-
-	SS[0].invites.add(invitee[0])
-	
-
-	return render(request, 'secret_santa_page.html', {'SecretSanta':SS[0]})
+	return redirect('secretsantaapp.views.CancelInvite', SecretSantaPage)
 
 
 def create_group(request):
@@ -112,8 +104,13 @@ def create_group(request):
 		newGroup.members.add(newGroup.owner)
 		newGroup.save()
 
+		owner = UserInfo.objects.get(user=request.user)
+		owner.groups.add(newGroup)
+
 		return render(request, 'homepage.html')
 
 	return render(request, 'create_group.html', {'SecretSantaGroupForm':ssgForm})
+
+
 
 

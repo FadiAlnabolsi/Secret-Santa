@@ -2,8 +2,11 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.contrib import auth
 from django.core.context_processors import csrf
+from django.contrib.auth.models import User
 #from django.contrib.auth.forms import UserCreationForm
 from secretsanta.forms import UserCreationForm
+
+from secretsantaapp.models import UserInfo
 
 def login(request):
 	c = {}
@@ -19,14 +22,14 @@ def auth_view(request):
 		auth.login(request, user)
 		return HttpResponseRedirect('/')
 	else:
-		return HttpResponseRedirect('/accounts/invalid')
+		return render_to_response("invalid.html")
 
 def loggedin(request):
 	return render_to_response('loggedin.html',
 							 {'full_name': request.user.username })
 
 def invalid_login(request):
-	return render_to_response("invalid_login.html")
+	return render_to_response("invalid.html")
 
 def logout(request):
 	auth.logout(request)
@@ -38,12 +41,15 @@ def register_user(request):
 
 		if form.is_valid():
 			form.save()
-			
+			username = form.data['username']
+			initializeUserInfo = UserInfo()
+			initializeUserInfo.user = User.objects.get(username=username)
+			initializeUserInfo.save()
+
 			return HttpResponseRedirect('/accounts/register_success')
 
 	args = {}
 	args.update(csrf(request))
-	print(UserCreationForm)
 	args['form'] = UserCreationForm()
 
 	return render_to_response('register.html', args)

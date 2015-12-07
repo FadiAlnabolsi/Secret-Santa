@@ -20,6 +20,7 @@ from . import views
 urlpatterns = [
     url(r'^$', views.homepage),
     url(r'^secretsanta/(?P<post_id>[0-9]+)/invite/(?P<invite>[-\w]+)$', views.SecretSantaPage),
+    url(r'^secretsanta/(?P<post_id>[0-9]+)/cancel/(?P<invite>[-\w]+)$', views.CancelInvite),
     url(r'^secretsanta/(?P<post_id>[0-9]+)$', views.SecretSantaPage),
     url(r'^create_group$', views.create_group),
 ]
