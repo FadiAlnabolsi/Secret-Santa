@@ -10,6 +10,15 @@
 
 	{% if user.is_authenticated %}
 		<a href="create_group">Create a new Secret Santa Group!</a>
+
+		{% for invites in userInfo.invites.all %}
+			<p>
+				{{invites.group_name}}
+				<a href="/secretsanta/{{invites.pk}}/accept/{{user.username}}"><button>Accept Invite</button></a>
+
+				<a href="/secretsanta/{{invites.pk}}/decline/{{user.username}}"><button>Decline Invite</button></a>
+			</p>
+		{% endfor %}
 	{% endif %}
 
 {% endblock %}

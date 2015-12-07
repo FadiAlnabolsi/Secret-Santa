@@ -20,7 +20,10 @@ def homepage(request):
 	for group in userInfo.groups.all():
 		userGroups.append(group)
 
-	return render(request, 'homepage.html', {'SecretSantaGroups':userGroups})
+	return render(request, 'homepage.html', {
+										'SecretSantaGroups':userGroups,
+										'userInfo':userInfo,
+										})
 
 
 def SecretSantaPage(request, post_id, invite=''):
@@ -73,6 +76,7 @@ def SecretSantaPage(request, post_id, invite=''):
 
 	return render(request, 'secret_santa_page.html', {'SecretSanta':SS})
 
+#For Owner Of a group
 def CancelInvite(request, post_id, invite):
 	try:
 		SS = SecretSantaGroup.objects.get(pk=post_id)
@@ -91,6 +95,76 @@ def CancelInvite(request, post_id, invite):
 	SS.invites.remove(removedUser)
 
 	return redirect('secretsantaapp.views.CancelInvite', SecretSantaPage)
+
+#for a person invited to a group
+def AcceptInvite(request, post_id, invite):
+	try:
+		SS = SecretSantaGroup.objects.get(pk=post_id)
+	except Exception as e:
+		return redirect('secretsantaapp.views.homepage')
+
+	if (request.user not in SS.invites.all()):
+		return redirect('secretsantaapp.views.homepage')
+
+	AddedUser = User.objects.get(username=invite)
+	AddedUserInfo = UserInfo.objects.get(user=AddedUser)
+	AddedUserInfo.invites.remove(SS)
+	AddedUserInfo.groups.add(SS)
+
+	SS.invites.remove(AddedUser)
+	SS.members.add(AddedUser)
+
+	return redirect('secretsantaapp.views.homepage')
+	
+def DeclineInvite(request, post_id, invite):
+	try:
+		SS = SecretSantaGroup.objects.get(pk=post_id)
+	except Exception as e:
+		return redirect('secretsantaapp.views.homepage')
+
+	if (request.user not in SS.invites.all()):
+		return redirect('secretsantaapp.views.homepage')
+
+	AddedUser = User.objects.get(username=invite)
+	AddedUserInfo = UserInfo.objects.get(user=AddedUser)
+	AddedUserInfo.invites.remove(SS)
+
+	SS.invites.remove(AddedUser)
+
+	return redirect('secretsantaapp.views.homepage')
+
+def LeaveGroup(request, post_id, invite):
+	try:
+		SS = SecretSantaGroup.objects.get(pk=post_id)
+		RemoveUser = User.objects.get(username=invite)
+		RemoveUserInfo = UserInfo.objects.get(user=RemoveUser)
+	except Exception as e:
+		return redirect('secretsantaapp.views.homepage')
+
+	if (request.user not in SS.members.all()):
+		return redirect('secretsantaapp.views.homepage')
+
+	if (request.user == SS.owner):
+		SS.delete()
+		return redirect('secretsantaapp.views.homepage')
+
+	SS.members.remove(RemoveUser)
+	RemoveUserInfo.groups.remove(SS)
+
+	return redirect('secretsantaapp.views.homepage')
+
+def GenerateAssignment(request, post_id, invite):
+	try:
+		SS = SecretSantaGroup.objects.get(pk=post_id)
+	except Exception as e:
+		return redirect('secretsantaapp.views.homepage')
+
+	if (request.user != SS.owner):
+		return redirect('secretsantaapp.views.homepage')
+
+	SS.generate_assignments()
+	return redirect('secretsantaapp.views.SecretSantaPage', post_id)
+
 
 
 def create_group(request):
