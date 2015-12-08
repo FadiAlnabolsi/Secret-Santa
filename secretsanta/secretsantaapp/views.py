@@ -32,12 +32,12 @@ def SecretSantaPage(request, post_id, invite=''):
 	except Exception as e:
 		return redirect('secretsantaapp.views.homepage')
 
-	print(SS.assignments_generated)
 	if (request.user not in SS.members.all()):
 		return redirect('secretsantaapp.views.homepage')
 
 	inv = request.POST.get("invite", "")
-
+	assign = {}
+	
 	#check if an invite was sent
 	if (inv != ''):
 		alreadyInvited = False
@@ -75,7 +75,8 @@ def SecretSantaPage(request, post_id, invite=''):
 
 		return render(request, 'secret_santa_page.html', {'SecretSanta':SS})
 
-	assign = assignment.objects.get(group=SS, giver=request.user)
+	if (SS.assignments_generated == True):
+		assign = assignment.objects.get(group=SS, giver=request.user)
 
 	return render(request, 'secret_santa_page.html', {'SecretSanta':SS, 'assignment':assign})
 
