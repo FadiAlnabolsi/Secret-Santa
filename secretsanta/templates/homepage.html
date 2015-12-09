@@ -1,18 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<p>Homepage for Secret Santa!</p>
-	{% for group in SecretSantaGroups %}
-		<p>
-			<a href="/secretsanta/{{group.pk}}">{{group.group_name}}</a>
-		</p>
-	{% endfor %}
-
 	{% if user.is_authenticated %}
-		<a href="create_group">Create a new Secret Santa Group!</a>
-
-		{% for invites in userInfo.invites.all %}
+		<a href="create_group" class="top-menu"><span class="glyphicon glyphicon-plus"></span></a>
+		<p>Current Groups:</p>
+		{% for group in SecretSantaGroups %}
 			<p>
+				<a id="group_name" href="/secretsanta/{{group.pk}}">{{group.group_name}}</a>
+			</p>
+		{% endfor %}
+		{% for invites in userInfo.invites.all %}
+			<p class="content">
 				{{invites.group_name}}
 				<a href="/secretsanta/{{invites.pk}}/accept/{{user.username}}"><button>Accept Invite</button></a>
 
