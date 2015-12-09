@@ -1,24 +1,45 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html>
 <head>
 	<title>Secret Santa</title>
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+	<link href='//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="{% static 'css/secretsanta.css' %}">
 </head>
 <body>
-	<div>
-		<a href="/"><h1>Secret Santa!</h1></a>
-		{% if user.is_authenticated %}
-			<p>Welcome {{user.first_name}}!</p>
-			<a href="/accounts/logout">Log Out</a>
-		{% else %}
-			<a href="/accounts/login/">Log In</a>
-			<a href="/accounts/register/">Register</a>
-		{% endif %}
-	</div>
-
-	{% block content %} {% endblock %}
-
-	<div class="footer">
-		<h3>About Us</h3>
+	<div class="page-wrap">
+		<nav class="navbar navbar-default"> 
+			<a href="about_us"><h3 id="about">About Us</h3></a>
+		</nav>
+		<div class="jumbotron">
+			<div class="page-header">
+				<a href="/"><h1>Secret Santa!</h1></a>
+				{% if user.is_authenticated %}
+					<p>Welcome {{user.first_name}}!</p>
+					<a href="/accounts/logout" class="btn btn-primary">Log Out</a>
+				{% else %}
+				<a id="login_link" href="/accounts/login/" class="btn btn-primary">Log In</a>
+				<a id="register_link" href="/accounts/register/" class="btn btn-primary">Sign Up</a>
+				{% endif %}
+			</div>
+			<div class="content container">
+				<div class="row">
+					<div class="col-md-12">
+						{% block content %}
+						{% endblock %}
+					</div>
+				</div>
+			</div>
+			<div class="footer">
+				<div class="row">
+					<div class="col-md-12">
+						<h3 id="made_with">Made With Django</h3>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </body>
 </html>

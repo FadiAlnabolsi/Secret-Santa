@@ -4,5 +4,5 @@
 	<p>Group Creation Page</p>
 	<form method="POST" class="post-form">{% csrf_token %}
 		{{ SecretSantaGroupForm.as_p }}
-		<button type="submit" name="submit" value="submit">Create Group</button>
+		<button type="submit" name="submit" value="submit" class="btn btn-primary">Create Group</button>
 {% endblock %}
