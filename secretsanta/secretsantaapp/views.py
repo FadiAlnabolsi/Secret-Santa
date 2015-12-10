@@ -184,6 +184,15 @@ def GenerateAssignment(request, post_id, invite):
 		peopleInfo.invites.clear()
 	return redirect('secretsantaapp.views.SecretSantaPage', post_id)
 
+def removeUserFromGroup(request, post_id, user):
+	try:
+		SS = SecretSantaGroup.objects.get(pk=post_id)
+	except Exception as e:
+		return redirect('secretsantaapp.views.homepage')
+
+	if (request.user != SS.owner):
+		return redirect('secretsantaapp.views.homepage')
+
 
 
 def create_group(request):
@@ -222,9 +231,9 @@ def WishList(request, username):
 		newItem.save()
 
 	if (request.user == user):
-		return render(request, 'wishlist.html', {'items':wishlistItems, 'isUser':True, 'WishListForm':WishListForm})
+		return render(request, 'wishlist.html', {'items':wishlistItems, 'wishUser':user, 'isUser':True, 'WishListForm':WishListForm})
 
-	return render(request, 'wishlist.html', {'items':wishlistItems, 'isUser':False})
+	return render(request, 'wishlist.html', {'items':wishlistItems,'wishUser':user, 'isUser':False})
 
 def deleteWishlistItem(request, username, item_id):
 	if (request.user.username != username):
