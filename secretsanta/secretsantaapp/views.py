@@ -111,8 +111,11 @@ def CancelInvite(request, post_id, invite):
 #for a person invited to a group
 def AcceptInvite(request, post_id, invite):
 	try:
+		print('1')
+		print(post_id)
 		SS = SecretSantaGroup.objects.get(pk=post_id)
 	except Exception as e:
+		print('2')
 		return redirect('secretsantaapp.views.homepage')
 
 	if (request.user not in SS.invites.all()):
@@ -122,6 +125,7 @@ def AcceptInvite(request, post_id, invite):
 	AddedUserInfo = UserInfo.objects.get(user=AddedUser)
 	AddedUserInfo.invites.remove(SS)
 	AddedUserInfo.groups.add(SS)
+	print('2')
 
 	SS.invites.remove(AddedUser)
 	SS.members.add(AddedUser)
