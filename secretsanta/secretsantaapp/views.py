@@ -104,6 +104,8 @@ def CancelInvite(request, post_id, invite):
 	removedUserInfo = UserInfo.objects.get(user=removedUser)
 	removedUserInfo.invites.remove(SS)
 
+
+
 	#remove invite from group
 	SS.invites.remove(removedUser)
 
@@ -184,7 +186,7 @@ def GenerateAssignment(request, post_id, invite):
 		peopleInfo.invites.clear()
 	return redirect('secretsantaapp.views.SecretSantaPage', post_id)
 
-def removeUserFromGroup(request, post_id, user):
+def removeUserFromGroup(request, post_id, victim):
 	try:
 		SS = SecretSantaGroup.objects.get(pk=post_id)
 	except Exception as e:
@@ -193,7 +195,13 @@ def removeUserFromGroup(request, post_id, user):
 	if (request.user != SS.owner):
 		return redirect('secretsantaapp.views.homepage')
 
+	RemoveUser = User.objects.get(username=victim)
+	RemoveUserInfo = UserInfo.objects.get(user=RemoveUser)
+	SS.members.remove(RemoveUser)
+	RemoveUserInfo.groups.remove(SS)
 
+
+	return redirect('secretsantaapp.views.SecretSantaPage', post_id)
 
 def create_group(request):
 	ssgForm = SecretSantaGroupForm(request.POST)
