@@ -10,11 +10,11 @@
 			</p>
 		{% endfor %}
 		{% for invites in userInfo.invites.all %}
-			<p class="content">
+			<p>
 				{{invites.group_name}}
-				<a href="/secretsanta/{{invites.pk}}/accept/{{user.username}}"><button>Accept Invite</button></a>
+				<a href="/secretsanta/{{invites.pk}}/accept/{{user.username}}"><button class="btn btn-primary">Accept Invite</button></a>
 
-				<a href="/secretsanta/{{invites.pk}}/decline/{{user.username}}"><button>Decline Invite</button></a>
+				<a href="/secretsanta/{{invites.pk}}/decline/{{user.username}}"><button class="btn btn-primary">Decline Invite</button></a>
 			</p>
 		{% endfor %}
 	{% endif %}

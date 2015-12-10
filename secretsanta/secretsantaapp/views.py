@@ -12,9 +12,6 @@ from secretsantaapp.models import SecretSantaGroup, assignment, UserInfo
 #homepage has a view to every group that the logged in user is accessed to
 
 def about_us(request):
-	if (request.user.is_anonymous()):
-		return render(request, 'homepage.html')
-	
 	return render(request, 'about_us.html')
 
 
