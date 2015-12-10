@@ -26,6 +26,8 @@ urlpatterns = [
     url(r'^secretsanta/(?P<post_id>[0-9]+)/leave/(?P<invite>[-\w]+)$', views.LeaveGroup),
     url(r'^secretsanta/(?P<post_id>[0-9]+)/generateassignments/(?P<invite>[-\w]+)$', views.GenerateAssignment),
     url(r'^secretsanta/(?P<post_id>[0-9]+)$', views.SecretSantaPage),
+    url(r'^secretsanta/(?P<username>[-\w]+)/wishlist$', views.WishList),
+    url(r'^secretsanta/(?P<username>[-\w]+)/wishlist/remove/(?P<item_id>[0-9]+)$', views.deleteWishlistItem),
     url(r'^create_group$', views.create_group),
     url(r'^about_us$', views.about_us ),
 ]

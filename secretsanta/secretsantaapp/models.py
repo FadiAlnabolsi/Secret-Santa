@@ -53,8 +53,8 @@ class SecretSantaGroup(models.Model):
 		assignments = assignment.objects.filter(group=self)
 		if (self.assignments_generated == False):
 			self.assignments_generated = True
-			self.save() 
-			
+			self.save()
+
 			for member in self.members.all():
 				if (self.check_if_giver(self, member) == False):
 					#if not a giver, give to someone
@@ -87,8 +87,12 @@ class UserInfo(models.Model):
 	user = models.OneToOneField(User, null=True)
 	groups = models.ManyToManyField(SecretSantaGroup, related_name='participating_in', blank=True)
 	invites = models.ManyToManyField(SecretSantaGroup, related_name='invited_to', blank=True)
-	
+
 	# def clean(self):
 	# 	if self.giver not in self.group.members:
 	# 		raise ValidationError(('giver', 'The giver is not in this group'))
 	# 	super().clean()
+
+class Item(models.Model):
+    text = models.TextField(default='')
+    user = models.ForeignKey(User, default=None)

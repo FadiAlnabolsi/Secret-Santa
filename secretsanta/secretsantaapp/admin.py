@@ -2,12 +2,13 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 
-from .models import SecretSantaGroup, assignment, UserInfo
+from .models import SecretSantaGroup, assignment, UserInfo, Item
 
 # Register your models here.
 
 admin.site.register(SecretSantaGroup)
 admin.site.register(assignment)
+admin.site.register(Item)
 
 class User_Info(admin.StackedInline):
 	model = UserInfo

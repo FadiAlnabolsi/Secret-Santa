@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 
-from secretsantaapp.forms import SecretSantaGroupForm
-from secretsantaapp.models import SecretSantaGroup, assignment, UserInfo
+from secretsantaapp.forms import SecretSantaGroupForm, ItemForm
+from secretsantaapp.models import SecretSantaGroup, assignment, UserInfo, Item
 
 
 # Create your views here.
@@ -203,6 +203,42 @@ def create_group(request):
 		return redirect('secretsantaapp.views.homepage')
 
 	return render(request, 'create_group.html', {'SecretSantaGroupForm':ssgForm})
+
+def WishList(request, username):
+	isUser = False
+
+	if (request.user.is_anonymous()):
+		return redirect('secretsantaapp.views.homepage')
+
+	WishListForm = ItemForm(request.POST)
+	user = User.objects.get(username=username)
+	wishlistItems = Item.objects.all().filter(user=user)
+
+	if (WishListForm.is_valid()):
+		newItem = Item()
+		newItem.user = user
+		newItem.user_id = user.id
+		newItem.text = WishListForm.data['text']
+		newItem.save()
+
+	if (request.user == user):
+		return render(request, 'wishlist.html', {'items':wishlistItems, 'isUser':True, 'WishListForm':WishListForm})
+
+	return render(request, 'wishlist.html', {'items':wishlistItems, 'isUser':False})
+
+def deleteWishlistItem(request, username, item_id):
+	if (request.user.username != username):
+		return redirect('secretsantaapp.views.homepage')
+
+	try:
+		user = User.objects.get(username=username)
+		item = Item.objects.get(user=user, pk=item_id)
+		item.delete()
+		return redirect('secretsantaapp.views.WishList', user.username)
+
+	except Exception as e:
+		return redirect('secretsantaapp.views.WishList', username)
+
 
 
 

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h3>{{user.first_name}} {{user.last_name}}'s Wishlist!</h3>
+    <p>-----------------------</p>
+    <br>
+
+    {% if isUser %}
+        {% for item in items.all %}
+            <p>{{item.text}}</p>
+            <a href="/secretsanta/{{user.username}}/wishlist/remove/{{item.pk}}">Remove</a>
+        {% endfor %}
+        <br>
+        <form method="POST" class="post-form">{% csrf_token %}
+        {{ WishListForm.as_p }}
+        <button type="submit" name="submit" value="submit" class="btn btn-primary">Add to Wishlist</button>
+</form>
+    {% else %}
+        {% for item in items.all %}
+            <p>{{item.text}}</p>
+        {% endfor %}
+    {% endif %}
+
+{% endblock %}
