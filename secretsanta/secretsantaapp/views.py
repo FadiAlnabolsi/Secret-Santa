@@ -42,7 +42,7 @@ def SecretSantaPage(request, post_id, invite=''):
 
 	inv = request.POST.get("invite", "")
 	assign = {}
-	
+
 	#check if an invite was sent
 	if (inv != ''):
 		alreadyInvited = False
@@ -66,19 +66,23 @@ def SecretSantaPage(request, post_id, invite=''):
 		if (alreadyInvited == True):
 			return redirect('secretsantaapp.views.SecretSantaPage', post_id)
 
-		try:	
+		try:
 			newInfo = UserInfo()
 			newInfo.user = invitee
 			newInfo.save()
 			newInfo.invites.add(SS)
 			newInfo.save()
 		except Exception as e:
-			newInfo = UserInfo.objects.get(user=request.user)
-			newInfo.groups.add(SS)	
+			newInfo = UserInfo.objects.get(user=invitee)
+			newInfo.invites.add(SS)
+			newInfo.save()
+			print(newInfo.user)
+
 
 		SS.invites.add(invitee)
 
 		return render(request, 'secret_santa_page.html', {'SecretSanta':SS})
+
 
 	if (SS.assignments_generated == True):
 		assign = assignment.objects.get(group=SS, giver=request.user)
@@ -103,16 +107,13 @@ def CancelInvite(request, post_id, invite):
 	#remove invite from group
 	SS.invites.remove(removedUser)
 
-	return redirect('secretsantaapp.views.CancelInvite', SecretSantaPage)
+	return redirect('secretsantaapp.views.SecretSantaPage', post_id)
 
 #for a person invited to a group
 def AcceptInvite(request, post_id, invite):
 	try:
-		print('1')
-		print(post_id)
 		SS = SecretSantaGroup.objects.get(pk=post_id)
 	except Exception as e:
-		print('2')
 		return redirect('secretsantaapp.views.homepage')
 
 	if (request.user not in SS.invites.all()):
@@ -122,14 +123,13 @@ def AcceptInvite(request, post_id, invite):
 	AddedUserInfo = UserInfo.objects.get(user=AddedUser)
 	AddedUserInfo.invites.remove(SS)
 	AddedUserInfo.groups.add(SS)
-	print('2')
 
 	SS.invites.remove(AddedUser)
 	SS.members.add(AddedUser)
 	SS.assignments_generated = True
 
 	return redirect('secretsantaapp.views.homepage')
-	
+
 def DeclineInvite(request, post_id, invite):
 	try:
 		SS = SecretSantaGroup.objects.get(pk=post_id)
@@ -178,7 +178,7 @@ def GenerateAssignment(request, post_id, invite):
 
 	SS.generate_assignments()
 	SS.invites.clear()
-	
+
 	for people in SS.invites.all():
 		peopleInfo =  UserInfo(user=people)
 		peopleInfo.invites.clear()
